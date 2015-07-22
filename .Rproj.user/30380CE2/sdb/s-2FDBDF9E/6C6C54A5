@@ -1,0 +1,17 @@
+{
+    "contents" : "---\ntitle: \"Statistical Inference Project 1\"\nauthor: \"Joao Clemencio\"\ndate: \"22 July 2015\"\noutput: pdf_document\n---\n\n```{r libraries, echo=FALSE, warning=FALSE, message=FALSE}\nlibrary(ggplot2)\nlibrary(dplyr)\nlibrary(tidyr)\n```\n\n# Overview\n\nIn this project we will attempt to show that the averages of many exponential distributions follow the Central Limit Theorem, having an approximately Gaussian distibution.\n\n\n# Simulations\n\nTo run the simulations the `rexp` function was used, with 40 simulations and lambda = 0.2. What follows is an example of this simulation.\n\n```{r simulation_sample}\nn = 40\nlambda = 0.2\n\nsample.sim = rexp(n, lambda)\n\nprint(sample.sim, digits = 2)\n\nsummary(sample.sim)\n```\n\n\\pagebreak\n\n```{r simulation_sample_hist, echo = FALSE}\nhist(sample.sim, main = \"Sample Distribution Frequency\")\n```\n\nWe will now run 1000 of these simulations. The `exp.sims` variable is a matrix with 1000 rows (for each simulation group) and 40 columns (for each simulation in each group).\n\n```{r}\n\nsims = 1000\nn = 40\nlambda = 0.2\n\nexp.sims = matrix(\n  data = rexp(n*sims, lambda),\n  nrow = 1000,\n  ncol = 40,\n  byrow = TRUE)\n```\n\n\\pagebreak\nHere are the first 5 rows of this matrix, as well as an overlapping density plot of their distribution.\n\n```{r}\n\nprint(exp.sims[1:5,], digits = 2)\n\ndexp = t(exp.sims[1:5,]) %>% data.frame %>% tbl_df\ndexp = dexp %>% gather(set, val, X1:X5)\ndexp.plot = ggplot(dexp, aes(x=val, fill = set)) + geom_density(alpha=1/5)\n\nprint(dexp.plot)\n\n```\n\n\nIn this project you will investigate the exponential distribution in R and compare it with the Central Limit Theorem. The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. **Set lambda = 0.2 for all of the simulations.** You will investigate the distribution of averages of 40 exponentials. Note that you will need to do a thousand simulations.\n\nIllustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponentials.  You should\n\n1. Show the sample mean and compare it to the theoretical mean of the distribution.\n2. Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.\n3. Show that the distribution is approximately normal.\n\n",
+    "created" : 1437598354858.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "613510277",
+    "id" : "6C6C54A5",
+    "lastKnownWriteTime" : 1437603153,
+    "path" : "~/GitHub/StatisticalInferenceProject1/StatisticalInferenceProject1.Rmd",
+    "project_path" : "StatisticalInferenceProject1.Rmd",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "r_markdown"
+}
