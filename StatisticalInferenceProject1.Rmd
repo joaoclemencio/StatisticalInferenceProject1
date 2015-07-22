@@ -20,27 +20,22 @@ In this project we will attempt to show that the averages of many exponential di
 
 To run the simulations the `rexp` function was used, with 40 simulations and lambda = 0.2. What follows is an example of this simulation.
 
-```{r simulation_sample}
+```{r simulation_sample, fig.width=3, fig.height=3}
 n = 40
 lambda = 0.2
 
 sample.sim = rexp(n, lambda)
 
-print(sample.sim, digits = 2)
-
 summary(sample.sim)
+
+qplot(sample.sim, binwidth = 2, main = "Sample Distribution")
 ```
 
 \pagebreak
 
-```{r simulation_sample_hist, echo = FALSE}
-hist(sample.sim, main = "Sample Distribution Frequency")
-```
-
 We will now run 1000 of these simulations. The `exp.sims` variable is a matrix with 1000 rows (for each simulation group) and 40 columns (for each simulation in each group).
 
-```{r}
-
+```{r sims}
 sims = 1000
 n = 40
 lambda = 0.2
@@ -52,20 +47,62 @@ exp.sims = matrix(
   byrow = TRUE)
 ```
 
-\pagebreak
-Here are the first 5 rows of this matrix, as well as an overlapping density plot of their distribution.
+# Sample Mean vs Theoretical Mean
 
-```{r}
+Calculating the means for each of the simulations
 
-print(exp.sims[1:5,], digits = 2)
+```{r means_plot, fig.height=3, fig.width=3}
 
-dexp = t(exp.sims[1:5,]) %>% data.frame %>% tbl_df
-dexp = dexp %>% gather(set, val, X1:X5)
-dexp.plot = ggplot(dexp, aes(x=val, fill = set)) + geom_density(alpha=1/5)
+exp.means = apply(exp.sims, 1, mean)
+theo.mean = 1/lambda
 
-print(dexp.plot)
+c("Expected Mean" = theo.mean, "Actual Mean of Means" = mean(exp.means))
+
+exp.means.plot = ggplot(
+  data = data.frame(m = exp.means) %>% tbl_df, 
+  aes(x=m)) +
+  
+  geom_histogram() +
+  geom_vline(
+    xintercept = mean(exp.means), 
+    colour = "green", 
+    linetype = "dashed") + 
+  geom_vline(
+    xintercept = theo.mean, 
+    colour = "red",
+    linetype = "twodash")
+
+exp.means.plot
+
+theo.sd = 1/lambda
 
 ```
+
+```{r vars_plot, fig.height=3, fig.width=3}
+
+exp.vars = apply(exp.sims, 1, var)
+theo.var = (1/lambda)^2
+
+c("Expected Variance" = theo.var, "Actual Mean of Variances" = mean(exp.vars))
+
+exp.vars.plot = ggplot(
+  data = data.frame(m = exp.vars) %>% tbl_df, 
+  aes(x=m)) +
+  
+  geom_histogram() +
+  geom_vline(
+    xintercept = mean(exp.vars), 
+    colour = "green", 
+    linetype = "dashed") + 
+  geom_vline(
+    xintercept = theo.var, 
+    colour = "red",
+    linetype = "twodash")
+
+exp.vars.plot
+
+```
+
 
 
 In this project you will investigate the exponential distribution in R and compare it with the Central Limit Theorem. The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. **Set lambda = 0.2 for all of the simulations.** You will investigate the distribution of averages of 40 exponentials. Note that you will need to do a thousand simulations.
