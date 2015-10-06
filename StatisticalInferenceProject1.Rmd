@@ -1,7 +1,7 @@
 ---
-title: "Statistical Inference Project 1"
+title: "Statistical Inference Project 1 - Part 1"
 author: "Joao Clemencio"
-date: "22 July 2015"
+date: "27 September 2015"
 output: pdf_document
 ---
 
@@ -15,26 +15,18 @@ library(tidyr)
 
 In this project we will attempt to show that the averages of many exponential distributions follow the Central Limit Theorem, having an approximately Gaussian distibution.
 
-
 # Simulations
 
 To run the simulations the `rexp` function was used, with 40 simulations and lambda = 0.2. What follows is an example of this simulation.
-
 ```{r simulation_sample, fig.width=3, fig.height=3}
+set.seed(267)
 n = 40
 lambda = 0.2
-
 sample.sim = rexp(n, lambda)
-
 summary(sample.sim)
-
 qplot(sample.sim, binwidth = 2, main = "Sample Distribution")
 ```
-
-\pagebreak
-
 We will now run 1000 of these simulations. The `exp.sims` variable is a matrix with 1000 rows (for each simulation group) and 40 columns (for each simulation in each group).
-
 ```{r sims}
 sims = 1000
 n = 40
@@ -46,70 +38,42 @@ exp.sims = matrix(
   ncol = 40,
   byrow = TRUE)
 ```
-
 # Sample Mean vs Theoretical Mean
-
 Calculating the means for each of the simulations
-
 ```{r means_plot, fig.height=3, fig.width=3}
-
 exp.means = apply(exp.sims, 1, mean)
 theo.mean = 1/lambda
 
 c("Expected Mean" = theo.mean, "Actual Mean of Means" = mean(exp.means))
 
-exp.means.plot = ggplot(
-  data = data.frame(m = exp.means) %>% tbl_df, 
-  aes(x=m)) +
-  
-  geom_histogram() +
-  geom_vline(
-    xintercept = mean(exp.means), 
-    colour = "green", 
-    linetype = "dashed") + 
-  geom_vline(
-    xintercept = theo.mean, 
-    colour = "red",
-    linetype = "twodash")
-
-exp.means.plot
+ggplot(data = data.frame(m = exp.means) %>% tbl_df, aes(x=m)) + geom_histogram() + geom_vline(xintercept = mean(exp.means), colour = "green", linetype = "dashed") + geom_vline(xintercept = theo.mean, colour = "red", linetype = "twodash")
 
 theo.sd = 1/lambda
-
 ```
+# Sample Variance vs Theoretical Variance
 
 ```{r vars_plot, fig.height=3, fig.width=3}
-
 exp.vars = apply(exp.sims, 1, var)
 theo.var = (1/lambda)^2
 
 c("Expected Variance" = theo.var, "Actual Mean of Variances" = mean(exp.vars))
 
-exp.vars.plot = ggplot(
-  data = data.frame(m = exp.vars) %>% tbl_df, 
-  aes(x=m)) +
-  
-  geom_histogram() +
-  geom_vline(
-    xintercept = mean(exp.vars), 
-    colour = "green", 
-    linetype = "dashed") + 
-  geom_vline(
-    xintercept = theo.var, 
-    colour = "red",
-    linetype = "twodash")
-
-exp.vars.plot
-
+ggplot(data = data.frame(m = exp.vars) %>% tbl_df, aes(x=m)) + geom_histogram() + geom_vline(xintercept = mean(exp.vars), colour = "green", linetype = "dashed") + geom_vline(xintercept = theo.var, colour = "red", linetype = "twodash")
 ```
 
+# Show that the distribution is apparently normal
 
+```{r dens_plot, fig.height=4, fig.width=4}
+# We first plot the means
+hist(exp.means, breaks = n, prob = T, xlab = "Means", ylab="Density", main="Density of means")
+# And then plot the distribution over it
+x.fit = seq(min(exp.means), max(exp.means), length=100)
+y.fit = dnorm(x.fit, mean = 1/lambda, sd = (1/lambda/sqrt(n)))
+lines(x.fit, y.fit)
+```
 
-In this project you will investigate the exponential distribution in R and compare it with the Central Limit Theorem. The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. **Set lambda = 0.2 for all of the simulations.** You will investigate the distribution of averages of 40 exponentials. Note that you will need to do a thousand simulations.
-
-Illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponentials.  You should
-
-1. Show the sample mean and compare it to the theoretical mean of the distribution.
-2. Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
-3. Show that the distribution is approximately normal.
-
+For a better view of the apparent normality, we can use a Q-Q plot.
+```{r qq_plot, fig.height=4, fig.width=4}
+qqnorm(exp.means)
+qqline(exp.means)
+```

@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Statistical Inference Project 1 - Part 2\"\nauthor: \"Joao Clemencip\"\ndate: \"27 September 2015\"\noutput: pdf_document\n---\n\n```{r libraries, echo=FALSE, warning=FALSE, message=FALSE}\nlibrary(ggplot2)\nlibrary(dplyr)\nlibrary(tidyr)\n```\n\n# Overview\n\nIn this project we will attempt to show that the averages of many exponential distributions follow the Central Limit Theorem, having an approximately Gaussian distibution.\n\n```{r}\ndata(ToothGrowth)\nt = ToothGrowth %>% tbl_df\n```\n\n# Exploratory Data Analysis\n\n## Data Documentation\n\n### Description\n\nThe response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).\n\n### Format\n\nA data frame with 60 observations on 3 variables.\n\nlen\t(numeric): Tooth length\nsupp (factor): Supplement type (VC or OJ).\ndose (numeric): Dose in milligrams.\n\n### Basic Data Analysis\n\nSince the dose is an explanatory variable, we will convert into a factor instead of numeric.\n\n```{r}\nt$dose = as.factor(t$dose)\nhead(t)\nstr(t)\nsummary(t)\nggplot(\n  data = ToothGrowth,\n  aes(x = supp, y = len)\n  ) +\n  geom_boxplot(\n    aes(fill = supp)\n  ) + \n  facet_wrap(~ dose)\n```\n\nBased on this analysis, it appears that for both orange juice and ascorbic acid, there is a direct correlation with the dose supplied and the tooth growth. Orange juice appears to also be more effective at lower doses than for the equivalent dose of ascorbic acid. However, this difference is less prominent when higher doses were administered.\n\n# Confidence intervals and hypothesis testing\n\n```{r ttest}\nt.test(len ~ supp, data = ToothGrowth)\n```\n\nFrom these results, we cannot reject the null hypothesis that the supplement type has no effect on length.\n\nWe will now perorm a similar test, using the dose as a factor. For this, we will subset the data into 3 groups of dose combinations and perform tests between them.\n\n```{r}\nt.test(len ~ dose, data = ToothGrowth %>% filter(dose != 0.5)) # 1.0 and 2.0\nt.test(len ~ dose, data = ToothGrowth %>% filter(dose != 1.0)) # 0.5 and 2.0\nt.test(len ~ dose, data = ToothGrowth %>% filter(dose != 2.0)) # 0.5 and 1.0\n```\nWe can conclude that the dose has an effect on the growth.\n",
+    "created" : 1443379710355.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1078933823",
+    "id" : "E0469106",
+    "lastKnownWriteTime" : 1443391216,
+    "path" : "~/GitHub/StatisticalInferenceProject1/StatisticalInferenceProject1Part2.Rmd",
+    "project_path" : "StatisticalInferenceProject1Part2.Rmd",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

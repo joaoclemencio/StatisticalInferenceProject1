@@ -1,0 +1,75 @@
+---
+title: "Statistical Inference Project 1 - Part 2"
+author: "Joao Clemencip"
+date: "27 September 2015"
+output: pdf_document
+---
+
+```{r libraries, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+# Overview
+
+In this project we will attempt to show that the averages of many exponential distributions follow the Central Limit Theorem, having an approximately Gaussian distibution.
+
+```{r}
+data(ToothGrowth)
+t = ToothGrowth %>% tbl_df
+```
+
+# Exploratory Data Analysis
+
+## Data Documentation
+
+### Description
+
+The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).
+
+### Format
+
+A data frame with 60 observations on 3 variables.
+
+len	(numeric): Tooth length
+supp (factor): Supplement type (VC or OJ).
+dose (numeric): Dose in milligrams.
+
+### Basic Data Analysis
+
+Since the dose is an explanatory variable, we will convert into a factor instead of numeric.
+
+```{r}
+t$dose = as.factor(t$dose)
+head(t)
+str(t)
+summary(t)
+ggplot(
+  data = ToothGrowth,
+  aes(x = supp, y = len)
+  ) +
+  geom_boxplot(
+    aes(fill = supp)
+  ) + 
+  facet_wrap(~ dose)
+```
+
+Based on this analysis, it appears that for both orange juice and ascorbic acid, there is a direct correlation with the dose supplied and the tooth growth. Orange juice appears to also be more effective at lower doses than for the equivalent dose of ascorbic acid. However, this difference is less prominent when higher doses were administered.
+
+# Confidence intervals and hypothesis testing
+
+```{r ttest}
+t.test(len ~ supp, data = ToothGrowth)
+```
+
+From these results, we cannot reject the null hypothesis that the supplement type has no effect on length.
+
+We will now perorm a similar test, using the dose as a factor. For this, we will subset the data into 3 groups of dose combinations and perform tests between them.
+
+```{r}
+t.test(len ~ dose, data = ToothGrowth %>% filter(dose != 0.5)) # 1.0 and 2.0
+t.test(len ~ dose, data = ToothGrowth %>% filter(dose != 1.0)) # 0.5 and 2.0
+t.test(len ~ dose, data = ToothGrowth %>% filter(dose != 2.0)) # 0.5 and 1.0
+```
+We can conclude that the dose has an effect on the growth.
